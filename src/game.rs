@@ -28,6 +28,7 @@ impl Game{
                 result.push_str(format!("\u{001b}[0m{}",character).as_str());
             }
         }
+        result.push_str("\u{001b}[0m"); // Resets color
         self.tries-=1;
         if correct==5 {
             self.tries=0;

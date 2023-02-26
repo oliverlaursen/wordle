@@ -1,7 +1,6 @@
-use std::io::{self, Write};
+use std::io::{Write, stdout};
 
 use crate::game::Game;
-use std::io::stdout;
 
 pub mod game;
 
@@ -10,10 +9,10 @@ fn main() {
     println!("Du har {} forsøg til at gætte ordet",game.tries);
 
     while game.tries > 0 {
-        print!("Enter your guess :");
+        print!("Indtast dit gæt: ");
+        stdout().flush().unwrap();
         let mut guess = String::new();
         std::io::stdin().read_line(&mut guess).unwrap();
-        println!("{}",game.guess(guess.trim()));
-        print!("\u{001b}[0m");  // Resets color
+        println!("{}                  {} forsøg tilbage",game.guess(guess.trim()),game.tries);
     }
 }
