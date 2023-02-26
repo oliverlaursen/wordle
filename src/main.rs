@@ -1,4 +1,7 @@
+use std::io::{self, Write};
+
 use crate::game::Game;
+use std::io::stdout;
 
 pub mod game;
 
@@ -9,7 +12,8 @@ fn main() {
     while game.tries > 0 {
         print!("Enter your guess :");
         let mut guess = String::new();
-        let _b1 = std::io::stdin().read_line(&mut guess).unwrap();
-        println!("{}",game.guess(guess));
+        std::io::stdin().read_line(&mut guess).unwrap();
+        println!("{}",game.guess(guess.trim()));
+        print!("\u{001b}[0m");  // Resets color
     }
 }
