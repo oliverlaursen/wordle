@@ -1,10 +1,18 @@
 use std::fs;
-use rand::{seq::SliceRandom};
+use rand::seq::SliceRandom;
+use ansi_term::Colour;
 
 pub struct Game{
-    pub tries:u32,
+    pub tries: u32,
     word_length:usize,
-    word:String,
+    pub word: String,
+}
+
+pub enum RoundResult {
+    Continue(String),
+    Won,
+    Lost(String),
+    WrongLength,
 }
 
 impl Game{
@@ -25,42 +33,36 @@ impl Game{
         Game {tries:tries,word_length:word_length,word:w}
     }
 
-    pub fn guess(&mut self,guess:&str) -> String {
-        let mut result = String::new();
-        let mut correct = 0;
-        if guess.chars().count()!=self.word_length{
-            return String::from("Word must be 5 letters long");
+    pub fn guess(&mut self,guess:&str) -> RoundResult {
+        self.tries -= 1;
+        if guess.len() != self.word.len() {
+            self.tries += 1;
+            RoundResult::WrongLength
         }
-
-        for (index,character) in guess.chars().enumerate(){
-            if self.word.chars().nth(index).unwrap()==character{ 
-                result.push_str(format!("\u{001b}[32m{}",character).as_str()); // Green
-                correct+=1;
+        else if guess == self.word {
+            RoundResult::Won
+        }
+        else {
+            let result = guess.chars()
+                .zip(self.word.chars())
+                .map(|(a, b)| {
+                    if a == b {
+                        Colour::Green.paint(a.to_string()).to_string()
+                    }
+                    else if self.word.contains(a) {
+                        Colour::Yellow.paint(a.to_string()).to_string()
+                    }
+                    else {
+                        a.to_string()
+                    }
+                })
+                .collect();
+            if self.tries == 0 {
+                RoundResult::Lost(result)
             }
-            else if self.word.contains(character){
-                result.push_str(format!("\u{001b}[33m{}",character).as_str()); // Yellow
-            }
-            else{
-                result.push_str(format!("\u{001b}[0m{}",character).as_str());
+            else {
+                RoundResult::Continue(result)
             }
         }
-        result.push_str("\u{001b}[0m"); // Resets color
-        self.tries-=1;
-        if self.tries==0 {
-            self.loser();
-        }
-        if correct==self.word_length {
-            self.tries=0;
-            self.winner();
-        }
-        result
-    }
-
-    fn winner(&self){
-        println!("Tilykke, du gættede rigtigt!")
-    }
-
-    fn loser(&self){
-        println!("Øv, du har ikke flere forsøg, det rigtige ord var {}",self.word);
     }
 }
