@@ -16,22 +16,24 @@ pub enum RoundResult {
 }
 
 impl Game{
-
-    pub fn generate_word(word_length:usize) -> String {
+    pub fn generate_word(word_length: usize) -> String {
         let word_list:String = fs::read_to_string("wordlist_danish.txt").unwrap();
         let word_list_fixed_length:Vec<&str> = word_list
-            .split_whitespace()
-            .filter(|word| word.chars().count() == word_length)
-            .collect();
+          .lines().filter(|word| word.chars().count() == word_length)
+          .collect();
         let mut rng = rand::thread_rng();
         let word = word_list_fixed_length.choose(&mut rng).unwrap();
-        return word.to_string();
+        word.to_string()
     }
 
-    pub fn new(word_length:usize,tries:u32) -> Game{
-        let w = Game::generate_word(word_length);
-        Game {tries:tries,word_length:word_length,word:w}
+    pub fn new(word_length: usize, tries: u32) -> Self {
+        let word = Game::generate_word(word_length);
+        Self {
+            tries,
+            word,
+        }
     }
+
 
     pub fn guess(&mut self,guess:&str) -> RoundResult {
         self.tries -= 1;
