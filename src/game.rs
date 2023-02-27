@@ -4,7 +4,6 @@ use ansi_term::Colour;
 
 pub struct Game{
     pub tries: u32,
-    word_length:usize,
     pub word: String,
 }
 
@@ -33,7 +32,6 @@ impl Game{
             word,
         }
     }
-
 
     pub fn guess(&mut self,guess:&str) -> RoundResult {
         self.tries -= 1;
