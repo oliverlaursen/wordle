@@ -33,7 +33,10 @@ fn main() {
                 println!("Øv, du har ikke flere forsøg. Det rigtige ord var {}", game.word);
                 break;
             }
-            game::RoundResult::Continue(str) => println!("{}                  {} forsøg tilbage", str, game.tries),
+            game::RoundResult::Continue(str) => {
+                println!("{}                  {} forsøg tilbage", str, game.tries);
+                game.print_alphabet();
+        },
             game::RoundResult::WrongLength => println!("Word must be 5 letters long"),
         }
     }
