@@ -21,7 +21,7 @@ impl Game{
         let word_list:String = fs::read_to_string("wordlist_danish.txt").unwrap();
         let word_list_fixed_length:Vec<&str> = word_list
             .split_whitespace()
-            .filter(|word| word.len() == word_length)
+            .filter(|word| word.chars().count() == word_length)
             .collect();
         let mut rng = rand::thread_rng();
         let word = word_list_fixed_length.choose(&mut rng).unwrap();
@@ -35,7 +35,7 @@ impl Game{
 
     pub fn guess(&mut self,guess:&str) -> RoundResult {
         self.tries -= 1;
-        if guess.len() != self.word.len() {
+        if guess.chars().count() != self.word.len() {
             self.tries += 1;
             RoundResult::WrongLength
         }
