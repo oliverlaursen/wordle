@@ -16,7 +16,7 @@ pub enum RoundResult {
 
 impl Game{
     pub fn generate_word(word_length: usize) -> String {
-        let word_list:String = fs::read_to_string("wordlist_danish.txt").unwrap();
+        let word_list:String = fs::read_to_string("popular_wordlist_danish.txt").unwrap(); 
         let word_list_fixed_length:Vec<&str> = word_list
           .lines().filter(|word| word.chars().count() == word_length)
           .collect();
@@ -35,9 +35,9 @@ impl Game{
 
     pub fn guess(&mut self,guess:&str) -> RoundResult {
         self.tries -= 1;
-        if guess.chars().count() != self.word.len() {
+        if guess.chars().count() != self.word.chars().count() {
             self.tries += 1;
-            RoundResult::WrongLength
+            return RoundResult::WrongLength;
         }
         else if guess == self.word {
             RoundResult::Won
@@ -50,7 +50,7 @@ impl Game{
                         Colour::Green.paint(a.to_string()).to_string()
                     }
                     else if self.word.contains(a) {
-                        Colour::Yellow.paint(a.to_string()).to_string()
+                        Colour::RGB(255, 140, 0).paint(a.to_string()).to_string()
                     }
                     else {
                         a.to_string()

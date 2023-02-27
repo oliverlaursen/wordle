@@ -1,11 +1,21 @@
 use std::io::{Write, stdout};
-
+use clap::Parser;
 use crate::game::Game;
 
 pub mod game;
 
+#[derive(Parser,Debug)]
+struct Args {
+    #[arg(short, default_value_t = 6)]
+    tries:u32,
+
+    #[arg(short, default_value_t = 5)]
+    word_length:usize,
+}
+
 fn main() {
-    let mut game = Game::new(5,3);
+    let args = Args::parse();
+    let mut game = Game::new(args.word_length,args.tries);
     println!("Du har {} forsøg til at gætte ordet",game.tries);
 
     loop {
