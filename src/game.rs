@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, collections::HashMap};
 use rand::seq::SliceRandom;
 use ansi_term::{Colour};
 
@@ -50,6 +50,11 @@ impl Game{
     pub fn guess(&mut self, guess:&str) -> RoundResult {
         self.tries -= 1;
         let guess = guess.to_uppercase();
+        let mut char_counts = HashMap::new();
+        for c in self.word.chars() {
+            *char_counts.entry(c).or_insert(0) += 1;
+        }
+
         if guess.chars().count() != self.word.chars().count() {
             self.tries += 1;
             return RoundResult::WrongLength;
@@ -58,16 +63,15 @@ impl Game{
             RoundResult::Won
         }
         else {
-            let result = guess.chars()
+            let mut result:String = guess.chars()
                 .zip(self.word.clone().chars())
                 .map(|(a, b)| {
-                    if a == b {
+                    if a == b && char_counts.get(&a).unwrap()>&0 {
                         self.alphabet=self.update_char(a, Colour::Green);
+                        if let Some(count) = char_counts.get_mut(&a) {
+                            *count -= 1;
+                        }
                         Colour::Green.paint(a.to_string()).to_string()
-                    }
-                    else if self.word.contains(a) {
-                        self.alphabet=self.update_char(a, Colour::RGB(255, 140, 0));
-                        Colour::RGB(255, 140, 0).paint(a.to_string()).to_string()
                     }
                     else {
                         self.alphabet=self.update_char(a, Colour::RGB(128,128,128));
@@ -75,12 +79,20 @@ impl Game{
                     }
                 })
                 .collect();
+            for (i,c) in guess.chars().enumerate() {
+                let green = self.word.as_bytes()[i]==guess.as_bytes()[i];
+                if self.word.contains(c) && !green && *char_counts.get(&c).unwrap()>0 {
+                    self.alphabet=self.update_char(c, Colour::RGB(255, 140, 0));
+                    result = result.clone().replace(c, Colour::RGB(255, 140, 0).paint(c.to_string()).to_string().as_str());
+                }
+            }
             if self.tries == 0 {
                 RoundResult::Lost(result)
             }
             else {
                 RoundResult::Continue(result)
             }
+            
         }
     }
 
