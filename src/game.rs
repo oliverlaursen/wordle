@@ -44,7 +44,7 @@ impl Game{
         for i in &self.alphabet{
             print!("{} ",i);
         }
-        println!("");
+        println!("\n");
     }
 
     pub fn guess(&mut self, guess:&str) -> RoundResult {
@@ -87,8 +87,13 @@ impl Game{
     pub fn update_char(&mut self, c:char,col:Colour) -> Vec<String>{
         let mut result = self.alphabet.clone();
         for i in &mut result{
-            if i==&c.to_uppercase().to_string(){
-                *i=col.paint(i.clone()).to_string();
+            let char_uncolored = i.chars().filter(|x|x.is_uppercase()).last().unwrap().to_string();
+            let uncolored = i.chars().count()==1;
+            let green = i.starts_with("\u{1b}[32");
+            if char_uncolored==c.to_uppercase().to_string() {
+                if uncolored || !green{
+                    *i=col.paint(char_uncolored).to_string();
+                }
             }
         }
         return result;

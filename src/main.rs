@@ -16,7 +16,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let mut game = Game::new(args.word_length,args.tries);
-    println!("Du har {} forsøg til at gætte ordet",game.tries);
+    println!("Du har {} forsøg til at gætte ordet\n",game.tries);
 
     loop {
         print!("Indtast dit gæt: ");
