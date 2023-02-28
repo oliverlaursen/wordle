@@ -5,16 +5,28 @@ use ansi_term::{Colour};
 pub struct Game{
     pub tries: u32,
     pub word: String,
-    alphabet:Vec<String>,
+    alphabet:Vec<WordleChar>,
 }
 
+#[derive(Clone,Debug)]
+pub struct WordleChar{
+    pub c: char,
+    pub state: WordleCharState,
+}
+
+#[derive(Clone,Copy,Debug)]
+pub enum WordleCharState{
+    Neutral,
+    Correct,
+    SemiCorrect,
+    NotUsed,
+}
 pub enum RoundResult {
     Continue(String),
     Won,
     Lost(String),
     WrongLength,
 }
-
 
 impl Game{
     pub fn generate_word(word_length: usize) -> String {
@@ -30,21 +42,18 @@ impl Game{
     pub fn new(word_length: usize, tries: u32) -> Self {
         let word = Game::generate_word(word_length);
         let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ".chars()
-            .map(|c| c.to_string())
-            .collect::<Vec<String>>();
+            .map(|c| WordleChar{c,state:WordleCharState::Neutral})
+            .collect::<Vec<WordleChar>>();
         Self {
             tries,
             word,
             alphabet,
         }
-
     }
 
     pub fn print_alphabet(&self){
-        for i in &self.alphabet{
-            print!("{} ",i);
-        }
-        println!("\n");
+        let alph = self.alphabet.clone();
+        println!("{} \n",self.wordle_chars_to_string(alph));
     }
 
     pub fn guess(&mut self, guess:&str) -> RoundResult {
@@ -63,51 +72,68 @@ impl Game{
             RoundResult::Won
         }
         else {
-            let mut result:String = guess.chars()
-                .zip(self.word.clone().chars())
-                .map(|(a, b)| {
-                    if a == b && char_counts.get(&a).unwrap()>&0 {
-                        self.alphabet=self.update_char(a, Colour::Green);
-                        if let Some(count) = char_counts.get_mut(&a) {
-                            *count -= 1;
-                        }
-                        Colour::Green.paint(a.to_string()).to_string()
+            let mut guess:Vec<WordleChar> = guess.chars().map(|x| WordleChar{c:x,state:WordleCharState::Neutral}).collect();
+            for (i,c) in guess.iter_mut().enumerate(){
+                if c.c==self.word.as_bytes()[i] as char && char_counts.get(&c.c).unwrap()>&0{
+                    c.state=WordleCharState::Correct;
+                    if let Some(count)=char_counts.get_mut(&c.c){
+                        *count-=1;
                     }
-                    else {
-                        self.alphabet=self.update_char(a, Colour::RGB(128,128,128));
-                        a.to_string()
-                    }
-                })
-                .collect();
-            for (i,c) in guess.chars().enumerate() {
-                let green = self.word.as_bytes()[i]==guess.as_bytes()[i];
-                if self.word.contains(c) && !green && *char_counts.get(&c).unwrap()>0 {
-                    self.alphabet=self.update_char(c, Colour::RGB(255, 140, 0));
-                    result = result.clone().replace(c, Colour::RGB(255, 140, 0).paint(c.to_string()).to_string().as_str());
+                    self.update_char(c.clone(),WordleCharState::Correct);
+                }
+                else{
+                    self.update_char(c.clone(), WordleCharState::NotUsed);
                 }
             }
+            for c in guess.iter_mut(){
+                if self.word.contains(c.c) && char_counts.get(&c.c).unwrap()>&0 && !matches!(c.state,WordleCharState::Correct){
+                    c.state=WordleCharState::SemiCorrect;
+                    if let Some(count)=char_counts.get_mut(&c.c){
+                        *count-=1;
+                    }
+                    self.update_char(c.clone(), WordleCharState::SemiCorrect);
+                }
+            }
+            let result_string = self.wordle_chars_to_string(guess);
             if self.tries == 0 {
-                RoundResult::Lost(result)
+                RoundResult::Lost(result_string)
             }
             else {
-                RoundResult::Continue(result)
+                RoundResult::Continue(result_string)
             }
             
         }
     }
 
-    pub fn update_char(&mut self, c:char,col:Colour) -> Vec<String>{
-        let mut result = self.alphabet.clone();
-        for i in &mut result{
-            let char_uncolored = i.chars().filter(|x|x.is_uppercase()).last().unwrap().to_string();
-            let uncolored = i.chars().count()==1;
-            let green = i.starts_with("\u{1b}[32");
-            if char_uncolored==c.to_uppercase().to_string() {
-                if uncolored || !green{
-                    *i=col.paint(char_uncolored).to_string();
+    pub fn wordle_chars_to_string(&self,input:Vec<WordleChar>) -> String{
+        let mut result="".to_string();
+        for c in input{
+            let painted = self.paint_wordle_char(c);
+            result.push_str(&painted);
+            result.push_str(" ");
+        }
+        result
+    }
+
+    pub fn paint_wordle_char(&self, input:WordleChar) -> String{
+        let col = match input.state {
+            WordleCharState::Neutral => Colour::White,
+            WordleCharState::Correct => Colour::Green,
+            WordleCharState::SemiCorrect => Colour::RGB(255, 140, 0),
+            WordleCharState::NotUsed => Colour::RGB(128, 128, 128),
+        };
+        col.paint(input.c.to_string()).to_string()
+    }
+
+    pub fn update_char(&mut self, c:WordleChar, st: WordleCharState){
+        let mut alph = self.alphabet.clone();
+        for mut i in alph.iter_mut(){
+            if c.c==i.c {
+                if !matches!(i.state,WordleCharState::Correct){
+                    i.state=st;
                 }
             }
         }
-        return result;
+        self.alphabet=alph;
     }
 }

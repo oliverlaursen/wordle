@@ -24,6 +24,7 @@ fn main() {
         stdout().flush().unwrap();
         let mut guess = String::new();
         std::io::stdin().read_line(&mut guess).unwrap();
+        println!("");
         match game.guess(guess.trim()) {
             game::RoundResult::Won => {
                 println!("Tillykke, du gættede rigtigt!");
