@@ -107,11 +107,16 @@ impl Game{
 
     pub fn wordle_chars_to_string(&self,input:Vec<WordleChar>) -> String{
         let mut result="".to_string();
-        for c in input{
+        result.push_str("┌───┐".repeat(input.len()).as_str());
+        result.push_str("\n");
+        for c in input.clone(){
             let painted = self.paint_wordle_char(c);
+            result.push_str("│ ");
             result.push_str(&painted);
-            result.push_str(" ");
+            result.push_str(" │");
         }
+        result.push_str("\n");
+        result.push_str("└───┘".repeat(input.len()).as_str());
         result
     }
 
