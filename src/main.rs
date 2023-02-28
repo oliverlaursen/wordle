@@ -13,10 +13,14 @@ struct Args {
     word_length:usize,
 }
 
+fn clear(){
+    println!("{}[2J", 27 as char);
+}
+
 fn main() {
     let args = Args::parse();
     let mut game = Game::new(args.word_length,args.tries);
-    print!("{}[2J", 27 as char);
+    clear();
     println!("Du har {} forsøg til at gætte ordet\n",game.tries);
 
     loop {
@@ -35,8 +39,10 @@ fn main() {
                 println!("Øv, du har ikke flere forsøg. Det rigtige ord var {}", game.word);
                 break;
             }
-            game::RoundResult::Continue(str) => {
-                println!("{}                  {} forsøg tilbage", str, game.tries);
+            game::RoundResult::Continue(_str) => {
+                clear();
+                println!("{}                {} forsøg tilbage", game.prev_guesses, game.tries);
+                println!("==================================================");
                 game.print_alphabet();
         },
             game::RoundResult::WrongLength => println!("Word must be 5 letters long"),

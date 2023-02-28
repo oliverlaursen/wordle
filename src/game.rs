@@ -6,6 +6,7 @@ pub struct Game{
     pub tries: u32,
     pub word: String,
     alphabet:Vec<WordleChar>,
+    pub prev_guesses:String,
 }
 
 #[derive(Clone,Debug)]
@@ -41,19 +42,32 @@ impl Game{
 
     pub fn new(word_length: usize, tries: u32) -> Self {
         let word = Game::generate_word(word_length);
-        let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ".chars()
+        let prev_guesses = "".to_string();
+        let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".chars()
             .map(|c| WordleChar{c,state:WordleCharState::Neutral})
             .collect::<Vec<WordleChar>>();
         Self {
             tries,
             word,
             alphabet,
+            prev_guesses,
         }
     }
 
     pub fn print_alphabet(&self){
         let alph = self.alphabet.clone();
-        println!("{} \n",self.wordle_chars_to_string(alph));
+        
+        let row1 = alph[0..=9].to_vec();
+        let row2 = alph[10..=18].to_vec();
+        let row3 = alph[19..=25].to_vec();
+
+
+
+        println!("{}",self.wordle_chars_to_string(row1));
+        println!("{}",self.wordle_chars_to_string(row2));
+        println!("{} \n",self.wordle_chars_to_string(row3));
+
+
     }
 
     pub fn guess(&mut self, guess:&str) -> RoundResult {
@@ -94,7 +108,9 @@ impl Game{
                     self.update_char(c.clone(), WordleCharState::SemiCorrect);
                 }
             }
-            let result_string = self.wordle_chars_to_string(guess);
+            let result_string = self.wordle_chars_to_string2(guess);
+            self.prev_guesses.push_str(result_string.as_str());
+            self.prev_guesses.push_str("\n");
             if self.tries == 0 {
                 RoundResult::Lost(result_string)
             }
@@ -120,12 +136,28 @@ impl Game{
         result
     }
 
+    pub fn wordle_chars_to_string2(&self,input:Vec<WordleChar>) -> String{
+        let mut result="".to_string();
+        result.push_str("           ");
+        result.push_str("┌───┐".repeat(input.len()).as_str());
+        result.push_str("\n           ");
+        for c in input.clone(){
+            let painted = self.paint_wordle_char(c);
+            result.push_str("│ ");
+            result.push_str(&painted);
+            result.push_str(" │");
+        }
+        result.push_str("\n           ");
+        result.push_str("└───┘".repeat(input.len()).as_str());
+        result
+    }
+
     pub fn paint_wordle_char(&self, input:WordleChar) -> String{
         let col = match input.state {
             WordleCharState::Neutral => Colour::White,
             WordleCharState::Correct => Colour::Green,
             WordleCharState::SemiCorrect => Colour::RGB(255, 140, 0),
-            WordleCharState::NotUsed => Colour::RGB(128, 128, 128),
+            WordleCharState::NotUsed => Colour::RGB(70, 70, 70),
         };
         col.paint(input.c.to_string()).to_string()
     }
