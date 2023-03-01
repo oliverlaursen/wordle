@@ -43,7 +43,7 @@ impl Game{
 
     pub fn new(word_length: usize, tries: u32, language: String) -> Self {
         let word = Game::generate_word(word_length,language);
-        let prev_guesses = "".to_string();
+        let prev_guesses = String::new();
         let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".chars()
             .map(|c| WordleChar{c,state:WordleCharState::Neutral})
             .collect::<Vec<WordleChar>>();

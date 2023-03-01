@@ -4,16 +4,16 @@ use crate::game::Game;
 
 pub mod game;
 
-#[derive(Parser,Debug)]
+#[derive(Parser, Debug)]
 struct Args {
     #[arg(short, default_value_t = 6)]
-    tries:u32,
+    tries: u32,
 
     #[arg(short, default_value_t = 5)]
-    word_length:usize,
+    word_length: usize,
 
     #[arg(short,long, default_value = "english")]
-    language:String,
+    language: String,
 }
 
 fn clear(){
