@@ -7,6 +7,7 @@ pub struct Game{
     pub word: String,
     alphabet:Vec<WordleChar>,
     pub prev_guesses:String,
+    pub language:String,
 }
 
 #[derive(Clone,Debug)]
@@ -42,9 +43,13 @@ impl Game{
     }
 
     pub fn new(word_length: usize, tries: u32, language: String) -> Self {
-        let word = Game::generate_word(word_length,language);
+        let word = Game::generate_word(word_length,language.clone());
         let prev_guesses = String::new();
-        let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".chars()
+        let alphabet = match language.as_str(){
+            "danish" => "QWERTYUIOPÅASDFGHJKLÆØZXCVBNM",
+            _ => "QWERTYUIOPASDFGHJKLZXCVBNM",
+        };
+        let alphabet = alphabet.chars()
             .map(|c| WordleChar{c,state:WordleCharState::Neutral})
             .collect::<Vec<WordleChar>>();
         Self {
@@ -52,15 +57,23 @@ impl Game{
             word,
             alphabet,
             prev_guesses,
+            language,
         }
     }
 
     pub fn print_alphabet(&self){
         let alph = self.alphabet.clone();
+        let key_offsets:Vec<usize>;
+        if self.language=="danish"{
+            key_offsets=vec![10,21,28]
+        }
+        else{
+            key_offsets=vec![9,18,25]
+        }
         
-        let row1 = alph[0..=9].to_vec();
-        let row2 = alph[10..=18].to_vec();
-        let row3 = alph[19..=25].to_vec();
+        let row1 = alph[0..=key_offsets[0]].to_vec();
+        let row2 = alph[key_offsets[0]+1..=key_offsets[1]].to_vec();
+        let row3 = alph[key_offsets[1]+1..=key_offsets[2]].to_vec();
 
 
 
