@@ -1,0 +1,8 @@
+YOU_WON:Congratz, that is right!
+TRIES1:You have 
+TRIES2:attempts at guessing the word
+GUESS:Enter your guess
+TRIES_LEFT:tries left
+LOSE:You have no more tries, the right word was
+WRONG_LENGTH1:The word has to be
+WRONG_LENGTH2:characters long

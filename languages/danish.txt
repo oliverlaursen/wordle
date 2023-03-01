@@ -1,0 +1,8 @@
+YOU_WON:Tillykke, du gættede rigtigt!
+TRIES1:Du har 
+TRIES2:forsøg til at gætte ordet
+GUESS:Indtast dit gæt: 
+TRIES_LEFT:forsøg tilbage
+LOSE:Øv, du har ikke flere forsøg. Det rigtige ord var
+WRONG_LENGTH1:Ordet skal være
+WRONG_LENGTH2:bogstaver langt
