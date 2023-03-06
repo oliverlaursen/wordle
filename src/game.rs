@@ -39,8 +39,7 @@ impl Game{
           .collect();
         let mut rng = rand::thread_rng();
         let word = word_list_fixed_length.choose(&mut rng).unwrap();
-        //word.to_uppercase()
-        "såsom".to_uppercase()
+        word.to_uppercase()
     }
 
     pub fn new(word_length: usize, tries: u32, language: String) -> Self {
