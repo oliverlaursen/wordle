@@ -39,7 +39,8 @@ impl Game{
           .collect();
         let mut rng = rand::thread_rng();
         let word = word_list_fixed_length.choose(&mut rng).unwrap();
-        word.to_uppercase()
+        //word.to_uppercase()
+        "såsom".to_uppercase()
     }
 
     pub fn new(word_length: usize, tries: u32, language: String) -> Self {
@@ -102,7 +103,7 @@ impl Game{
         else {
             let mut guess:Vec<WordleChar> = guess.chars().map(|x| WordleChar{c:x,state:WordleCharState::Neutral}).collect();
             for (i,c) in guess.iter_mut().enumerate(){
-                if c.c==self.word.as_bytes()[i] as char && char_counts.get(&c.c).unwrap()>&0{
+                if c.c==self.word.chars().nth(i).unwrap() as char && char_counts.get(&c.c).unwrap()>&0{
                     c.state=WordleCharState::Correct;
                     if let Some(count)=char_counts.get_mut(&c.c){
                         *count-=1;
