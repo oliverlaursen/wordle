@@ -26,5 +26,5 @@ cargo run -- -l danish
 This will change the language the messages are in, and the language in which the word is generated in.
 
 ## Adding a language
-To add a language, make a new .txt file in the languages folder (see english.txt for guideline). The language-file must be named <LANGUAGE>.txt
-You will also need to add a wordlist to the wordlists folder, containing words you wish to generate. The wordlist-file must be named wordlist_<LANGUAGE>.txt
+To add a language, make a new .txt file in the languages folder (see english.txt for guideline). The language-file must be named \<LANGUAGE\>.txt
+You will also need to add a wordlist to the wordlists folder, containing words you wish to generate. The wordlist-file must be named wordlist_\<LANGUAGE\>.txt
