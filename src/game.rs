@@ -110,6 +110,7 @@ impl Game{
             RoundResult::Won
         }
         else if !self.full_wordlist.contains(&guess){
+            self.tries += 1;
             RoundResult::NotRealWord
         }
         else {
