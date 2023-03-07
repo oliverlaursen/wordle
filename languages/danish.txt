@@ -1,5 +1,5 @@
 YOU_WON:Tillykke, du gættede rigtigt!
-TRIES1:Du har 
+TRIES1:Du har
 TRIES2:forsøg til at gætte ordet
 GUESS:Indtast dit gæt: 
 TRIES_LEFT:forsøg tilbage

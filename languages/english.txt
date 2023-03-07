@@ -1,5 +1,5 @@
 YOU_WON:Congratz, that is right!
-TRIES1:You have 
+TRIES1:You have
 TRIES2:attempts at guessing the word
 GUESS:Enter your guess
 TRIES_LEFT:tries left

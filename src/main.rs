@@ -20,29 +20,21 @@ fn clear(){
     println!("{}[2J", 27 as char);
 }
 
-fn load_languages() -> HashMap<String, HashMap<String,String>>{
-    let mut lang_map:HashMap<String, HashMap<String,String>> = HashMap::new();
-    let langs = fs::read_dir("./languages").unwrap();
-    for lang in langs{
-        let file_name = lang.unwrap().file_name();
-        let lang_name = file_name.to_str().unwrap().trim_end_matches(".txt").to_string();
-        let mut map:HashMap<String,String> = HashMap::new();
-        let file = fs::read_to_string(format!("./languages/{}",file_name.to_str().unwrap()));
-        for line in file.unwrap().lines() {
-            let key = line.split(":").next().unwrap().to_string();
-            let value = line.split(":").nth(1).unwrap().to_string();
-            map.insert(key, value);
-        }
-        lang_map.insert(lang_name, map);
+fn load_languages(language:String) -> HashMap<String, String>{
+    let mut map:HashMap<String, String> = HashMap::new();
+    let file = fs::read_to_string(format!("./languages/{}.txt",language));
+    for line in file.unwrap().lines() {
+        let key = line.split(":").next().unwrap().to_string();
+        let value = line.split(":").nth(1).unwrap().to_string();
+        map.insert(key, value);
     }
-    lang_map
+    map
 }
 
 fn main() {
     let args = Args::parse();
     let mut game = Game::new(args.word_length,args.tries,args.language.clone());
-    let lang_map = load_languages();
-    let lang_map = lang_map.get(&args.language.to_string()).unwrap();
+    let lang_map = load_languages(args.language);
     clear();
     println!("{} {} {}\n", lang_map.get("TRIES1").unwrap(),game.tries, lang_map.get("TRIES2").unwrap());
 

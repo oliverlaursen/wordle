@@ -34,7 +34,8 @@ pub enum RoundResult {
 
 impl Game{
     pub fn generate_word(word_length: usize,language: String) -> String {
-        let word_list:String = fs::read_to_string(format!("./wordlists/wordlist_{language}.txt",)).unwrap(); 
+        let word_list:String = fs::read_to_string(format!("./wordlists/wordlist_{language}.txt",))
+            .expect("Could not find wordlist"); 
 
         let word_list_fixed_length:Vec<&str> = word_list
           .lines().filter(|word| word.chars().count() == word_length)
@@ -54,7 +55,8 @@ impl Game{
         let alphabet = alphabet.chars()
             .map(|c| WordleChar{c,state:WordleCharState::Neutral})
             .collect::<Vec<WordleChar>>();
-        let full_wordlist:Vec<String> = fs::read_to_string(format!("./wordlists/wordlistfull_{language}.txt",)).unwrap()
+        let full_wordlist:Vec<String> = fs::read_to_string(format!("./wordlists/wordlistfull_{language}.txt",))
+            .expect("Could not find wordlistfull")
             .lines()
             .map(|x|x.to_uppercase())
             .collect(); 
