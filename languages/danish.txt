@@ -6,3 +6,4 @@ TRIES_LEFT:forsøg tilbage
 LOSE:Øv, du har ikke flere forsøg. Det rigtige ord var
 WRONG_LENGTH1:Ordet skal være
 WRONG_LENGTH2:bogstaver langt
+NOT_REAL_WORD:Ikke et rigtigt ord

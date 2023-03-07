@@ -8,6 +8,7 @@ pub struct Game{
     alphabet:Vec<WordleChar>,
     pub prev_guesses:String,
     pub language:String,
+    pub full_wordlist:Vec<String>,
 }
 
 #[derive(Clone,Debug)]
@@ -24,10 +25,11 @@ pub enum WordleCharState{
     NotUsed,
 }
 pub enum RoundResult {
-    Continue(String),
+    Continue,
     Won,
-    Lost(String),
+    Lost,
     WrongLength,
+    NotRealWord,
 }
 
 impl Game{
@@ -52,12 +54,17 @@ impl Game{
         let alphabet = alphabet.chars()
             .map(|c| WordleChar{c,state:WordleCharState::Neutral})
             .collect::<Vec<WordleChar>>();
+        let full_wordlist:Vec<String> = fs::read_to_string(format!("./wordlists/wordlistfull_{language}.txt",)).unwrap()
+            .lines()
+            .map(|x|x.to_uppercase())
+            .collect(); 
         Self {
             tries,
             word,
             alphabet,
             prev_guesses,
             language,
+            full_wordlist,
         }
     }
 
@@ -87,10 +94,11 @@ impl Game{
     pub fn guess(&mut self, guess:&str) -> RoundResult {
         self.tries -= 1;
         let guess = guess.to_uppercase();
+
+        // Create char_counts
         let mut char_counts = HashMap::new();
         for c in self.word.chars() {
-            *char_counts.entry(c).or_insert(0) += 1;
-        }
+            *char_counts.entry(c).or_insert(0) += 1;}
 
         if guess.chars().count() != self.word.chars().count() {
             self.tries += 1;
@@ -99,8 +107,14 @@ impl Game{
         else if guess == self.word {
             RoundResult::Won
         }
+        else if !self.full_wordlist.contains(&guess){
+            RoundResult::NotRealWord
+        }
         else {
+            // Convert guess chars to wordlechars
             let mut guess:Vec<WordleChar> = guess.chars().map(|x| WordleChar{c:x,state:WordleCharState::Neutral}).collect();
+            
+            // Check for chars with correct placement (green)
             for (i,c) in guess.iter_mut().enumerate(){
                 if c.c==self.word.chars().nth(i).unwrap() as char && char_counts.get(&c.c).unwrap()>&0{
                     c.state=WordleCharState::Correct;
@@ -113,25 +127,24 @@ impl Game{
                     self.update_char(c.clone(), WordleCharState::NotUsed);
                 }
             }
+
+            // Check for semi correct (orange) chars
             for c in guess.iter_mut(){
                 if self.word.contains(c.c) && char_counts.get(&c.c).unwrap()>&0 && !matches!(c.state,WordleCharState::Correct){
                     c.state=WordleCharState::SemiCorrect;
-                    if let Some(count)=char_counts.get_mut(&c.c){
-                        *count-=1;
-                    }
+                    if let Some(count)=char_counts.get_mut(&c.c){*count-=1;}
                     self.update_char(c.clone(), WordleCharState::SemiCorrect);
                 }
             }
-            let result_string = self.wordle_chars_to_string2(guess);
+            let result_string = self.wordle_chars_to_string_centered(guess);
             self.prev_guesses.push_str(result_string.as_str());
             self.prev_guesses.push_str("\n");
             if self.tries == 0 {
-                RoundResult::Lost(result_string)
+                RoundResult::Lost
             }
             else {
-                RoundResult::Continue(result_string)
+                RoundResult::Continue
             }
-            
         }
     }
 
@@ -150,7 +163,7 @@ impl Game{
         result
     }
 
-    pub fn wordle_chars_to_string2(&self,input:Vec<WordleChar>) -> String{
+    pub fn wordle_chars_to_string_centered(&self,input:Vec<WordleChar>) -> String{
         let mut result="".to_string();
         result.push_str("           ");
         result.push_str("┌───┐".repeat(input.len()).as_str());

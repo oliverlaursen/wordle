@@ -6,3 +6,4 @@ TRIES_LEFT:tries left
 LOSE:You have no more tries, the right word was
 WRONG_LENGTH1:The word has to be
 WRONG_LENGTH2:characters long
+NOT_REAL_WORD:Not a real word
