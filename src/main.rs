@@ -31,6 +31,13 @@ fn load_languages(language:String) -> HashMap<String, String>{
     map
 }
 
+fn print_game_state(game:&Game, lang_map:&HashMap<String, String>){
+    clear();
+    println!("{}                {} {}", game.prev_guesses, game.tries,lang_map.get("TRIES_LEFT").unwrap());
+    println!("==================================================");
+    game.print_alphabet();
+}
+
 fn main() {
     let args = Args::parse();
     let mut game = Game::new(args.word_length,args.tries,args.language.clone());
@@ -51,21 +58,18 @@ fn main() {
                 break;
             }
             game::RoundResult::Lost => {
-                clear();
-                println!("{}                {} {}", game.prev_guesses, game.tries,lang_map.get("TRIES_LEFT").unwrap());
-                println!("==================================================");
-                game.print_alphabet();
+                print_game_state(&game, &lang_map);
                 println!("{} {}", lang_map.get("LOSE").unwrap(),game.word);
                 break;
             }
             game::RoundResult::Continue => {
-                clear();
-                println!("{}                {} {}", game.prev_guesses, game.tries,lang_map.get("TRIES_LEFT").unwrap());
-                println!("==================================================");
-                game.print_alphabet();
+                print_game_state(&game, &lang_map);
         },
             game::RoundResult::WrongLength => println!("{} {} {}",lang_map.get("WRONG_LENGTH1").unwrap(),args.word_length,lang_map.get("WRONG_LENGTH2").unwrap()),
-            game::RoundResult::NotRealWord => println!("{}",lang_map.get("NOT_REAL_WORD").unwrap())
+            game::RoundResult::NotRealWord => {
+                print_game_state(&game, &lang_map);
+                println!("{}",lang_map.get("NOT_REAL_WORD").unwrap())
+            }
         }
     }
 }
